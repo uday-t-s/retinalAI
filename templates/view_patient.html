@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-11 col-lg-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('history') }}" class="btn btn-outline-light me-3"><i
+                        class="bi bi-arrow-left"></i></a>
+                <h3 class="mb-0 text-white">Patient Details</h3>
+                <div class="ms-auto text-end">
+                    <span class="text-white-50 small d-block">Record ID</span>
+                    <span class="text-white fw-bold">#{{ patient.id }}</span>
+                </div>
+            </div>
+
+            <div class="card-custom shadow-lg">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="row g-4">
+                        <!-- Left Column: Image & Status -->
+                        <div class="col-md-5 text-center text-md-start">
+                            <div class="mb-4">
+                                {% if patient.image_file %}
+                                <img src="{{ url_for('static', filename='uploads/' ~ patient.image_file) }}"
+                                    alt="Fundus Image" class="img-fluid rounded shadow border border-secondary"
+                                    style="max-height: 300px; width: 100%; object-fit: cover;">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='css/default.jpg') }}" alt="No Image"
+                                    class="img-fluid rounded shadow border border-secondary">
+                                {% endif %}
+                            </div>
+
+                            <!-- Diagnosis Card -->
+                            <div class="p-3 rounded bg-dark border border-secondary mb-3">
+                                <div class="text-white-50 small text-uppercase fw-bold mb-1">Diagnosis</div>
+                                <div class="h4 text-white mb-2">{{ patient.dr_stage }}</div>
+                                <div class="progress" style="height: 6px;">
+                                    {% set confidence = patient.confidence if patient.confidence else 0 %}
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar"
+                                        style="width: {{ confidence }}%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span class="small text-white-50">Confidence</span>
+                                    <span class="small text-white">{{ confidence }}%</span>
+                                </div>
+                            </div>
+
+                            <!-- Suitability Card -->
+                            <div class="p-3 rounded bg-dark border border-secondary">
+                                <div class="text-white-50 small text-uppercase fw-bold mb-1">Operation Suitability</div>
+                                {% if 'Not Suitable' in patient.operation_status %}
+                                <div class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-2"></i>Not Suitable
+                                </div>
+                                {% else %}
+                                <div class="text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Suitable
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Key Findings Card -->
+                            {% if findings %}
+                            <div class="p-3 rounded bg-dark border border-secondary mt-3">
+                                <div class="text-white-50 small text-uppercase fw-bold mb-2">Key Findings</div>
+                                <div class="d-flex flex-column gap-2">
+                                    {% for item in findings %}
+                                    <div class="d-flex align-items-center">
+                                        {% if item.present %}
+                                        <i class="bi bi-check-circle-fill text-primary me-2"></i>
+                                        <span class="text-white small">{{ item.positive if item.positive else item.text
+                                            }}</span>
+                                        {% else %}
+                                        <i class="bi bi-check-circle text-muted me-2 opacity-50"></i>
+                                        <span class="text-muted small text-decoration-line-through">{{ item.negative if
+                                            item.negative else item.text }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Right Column: Details -->
+                        <div class="col-md-7">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h2 class="text-white mb-1">{{ patient.name }}</h2>
+                                    <p class="text-white-50 mb-0"><i class="bi bi-calendar3 me-2"></i>Screened on {{
+                                        patient.date_posted.strftime('%B %d, %Y at %H:%M') }}</p>
+                                </div>
+                                <div class="badge bg-primary fs-6">{{ patient.gender }}</div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="text-white-50 small text-uppercase">Age</div>
+                                    <div class="text-white h5">{{ patient.age }} Years</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-white-50 small text-uppercase">Blood Group</div>
+                                    <div class="text-white h5">{{ patient.blood_group or '—' }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-white-50 small text-uppercase">Phone</div>
+                                    <div class="text-white">{{ patient.phone or '—' }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-white-50 small text-uppercase">Email</div>
+                                    <div class="text-white">{{ patient.email or '—' }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="text-white-50 small text-uppercase">Address</div>
+                                    <div class="text-white">{{ patient.address or '—' }}</div>
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
+                            <h5 class="text-white mb-3"><i class="bi bi-activity me-2"></i>Clinical Vitals</h5>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded bg-dark border border-secondary h-100">
+                                        <div class="text-white-50 small">Blood Pressure</div>
+                                        <div class="text-white fw-bold fs-5">{{ patient.systolic_bp }} / {{
+                                            patient.diastolic_bp }} <span class="fs-6 text-white-50">mmHg</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded bg-dark border border-secondary h-100">
+                                        <div class="text-white-50 small">HbA1c</div>
+                                        <div class="text-white fw-bold fs-5">{{ patient.hba1c }} <span
+                                                class="fs-6 text-white-50">%</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 rounded bg-dark border border-secondary h-100">
+                                        <div class="text-white-50 small">Cholesterol</div>
+                                        <div class="text-white fw-bold fs-5">{{ patient.cholesterol }} <span
+                                                class="fs-6 text-white-50">mg/dL</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 d-flex gap-2">
+                                {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('edit_patient', patient_id=patient.id) }}"
+                                    class="btn btn-primary-gradient flex-grow-1"><i
+                                        class="bi bi-pencil-fill me-2"></i>Edit Record</a>
+
+                                <form method="POST" action="{{ url_for('delete_patient', patient_id=patient.id) }}"
+                                    class="flex-grow-0"
+                                    onsubmit="return confirm('Delete this record? This action cannot be undone.');">
+                                    <button type="submit" class="btn btn-outline-danger"><i
+                                            class="bi bi-trash-fill"></i></button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

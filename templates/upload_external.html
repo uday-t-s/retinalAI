@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-9 col-lg-8">
+    <div class="card-custom shadow-lg mt-5">
+      <div class="card-body p-5">
+        <h3 class="mb-4 text-white">Upload External Dataset</h3>
+
+        <form method="POST" action="{{ url_for('upload_external') }}" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label class="form-label text-white-50 small text-uppercase fw-bold">Select CSV file</label>
+            <input type="file" name="dataset" accept=".csv"
+              class="form-control bg-dark text-white border-secondary form-control-lg" required>
+            <div class="form-text text-white-50 mt-2">
+              <i class="bi bi-info-circle me-1"></i> CSV must have two columns: <strong class="text-white">date</strong>
+              (YYYY-MM-DD) and <strong class="text-white">count</strong>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end align-items-center mt-5">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-link text-white-50 text-decoration-none me-3">Cancel</a>
+            <button class="btn btn-primary-gradient px-4 py-2">
+              <i class="bi bi-cloud-upload-fill me-2"></i>Upload Dataset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

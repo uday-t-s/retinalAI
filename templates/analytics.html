@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-11 col-lg-10">
+
+      <!-- Header -->
+      <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-light me-3"><i class="bi bi-house-door-fill"></i></a>
+        <h3 class="mb-0 text-white">Clinical Analytics</h3>
+      </div>
+
+      <div class="card-custom shadow-lg">
+        <div class="card-body p-4 p-lg-5">
+          <form method="GET" action="{{ url_for('analytics') }}" class="row g-3 mb-5 align-items-end">
+            <div class="col-auto">
+              <label class="form-label text-white-50 small text-uppercase">Select Year</label>
+              <select name="year" class="form-select bg-dark text-white border-secondary">
+                {% for y in years %}
+                <option value="{{ y }}" {% if y==selected_year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-primary-gradient"><i class="bi bi-filter me-2"></i>Show Data</button>
+              <a href="{{ url_for('analytics') }}" class="btn btn-outline-light ms-2">Clear</a>
+            </div>
+          </form>
+
+          {% if not years %}
+          <div class="text-center py-5">
+            <div class="fs-1 mb-3">📭</div>
+            <h4 class="text-white">No Records Found</h4>
+            <p class="text-white-50">Add patient records to generate analytics.</p>
+          </div>
+          {% else %}
+          <div class="position-relative" style="height: 400px;">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if years %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = {{ labels| tojson }};
+  const actual = {{ actual| tojson }};
+  const predicted = {{ predicted| tojson }};
+
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Actual cases ({{ selected_year }})',
+        data: actual,
+        borderColor: '#3b82f6', // Blue
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        pointBackgroundColor: '#3b82f6',
+        fill: true
+      },
+      {
+        label: 'Projected Cases',
+        data: predicted,
+        borderColor: '#ec4899', // Pink
+        backgroundColor: 'rgba(236, 72, 153, 0.0)',
+        borderDash: [5, 5],
+        borderWidth: 2,
+        tension: 0.4,
+        pointBackgroundColor: '#ec4899'
+      }
+    ]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#e2e8f0', usePointStyle: true, boxWidth: 6 }
+        },
+        title: {
+          display: false,
+          text: 'Monthly cases vs predicted',
+          color: '#e2e8f0'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          precision: 0,
+          grid: { color: 'rgba(255, 255, 255, 0.1)' },
+          ticks: { color: '#94a3b8' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#94a3b8' }
+        }
+      }
+    }
+  };
+
+  const ctx = document.getElementById('analyticsChart');
+  new Chart(ctx, config);
+</script>
+{% endif %}
+
+{% endblock %}

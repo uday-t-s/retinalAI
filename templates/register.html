@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5" style="min-height: 80vh; align-items: center;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card-custom shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="h2 text-white">Join RetinaAI</div>
+                    <p class="text-white-50">Create your account to get started</p>
+                </div>
+
+                <form method="POST">
+                    <div class="form-group mb-4">
+                        <label class="form-label text-white-50 small text-uppercase">Username</label>
+                        <input type="text" name="username"
+                            class="form-control bg-dark text-white border-secondary form-control-lg"
+                            placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="form-label text-white-50 small text-uppercase">Email Address</label>
+                        <input type="email" name="email"
+                            class="form-control bg-dark text-white border-secondary form-control-lg"
+                            placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="form-label text-white-50 small text-uppercase">Password</label>
+                        <input type="password" name="password"
+                            class="form-control bg-dark text-white border-secondary form-control-lg"
+                            placeholder="Create a password" required>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-primary-gradient btn-lg" type="submit">Create Account</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <span class="text-white-50">Already have an account?</span>
+                    <a href="{{ url_for('login') }}" class="text-primary text-decoration-none fw-bold ms-1">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

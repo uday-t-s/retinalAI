@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center animate-fade-in">
+        <div class="col-md-6 col-lg-5">
+            <div class="card-custom shadow-lg p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-white mb-1">Edit User</h3>
+                    <p class="text-white small">Managing user: <span class="text-primary">{{ user.username }}</span></p>
+                </div>
+
+                <form method="POST">
+                    <div class="mb-4">
+                        <label class="form-label text-white-50 xsmall text-uppercase fw-bold">Username</label>
+                        <input type="text" class="form-control form-control-dark" value="{{ user.username }}" disabled>
+                        <div class="form-text text-muted xsmall">Username cannot be changed.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label text-white-50 xsmall text-uppercase fw-bold">New
+                            Password</label>
+                        <input type="password" class="form-control form-control-dark" id="password" name="password"
+                            placeholder="Leave blank to keep current">
+                    </div>
+
+                    {% if user.role != 'admin' %}
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_blocked" name="is_blocked" {% if
+                                user.is_blocked %}checked{% endif %}>
+                            <label class="form-check-label text-white" for="is_blocked">Block User Access</label>
+                        </div>
+                        <div class="form-text text-danger xsmall" id="blockHelp">Blocked users cannot log in to the
+                            system.</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-gradient shadow-lg">Save Changes</button>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

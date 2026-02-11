@@ -1,0 +1,10 @@
+.venv/
+.venv311/
+venv/
+__pycache__/
+*.pyc
+*.h5
+*.zip
+instance/
+large_data/
+large_data_extracted/

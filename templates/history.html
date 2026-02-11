@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="card-custom shadow-lg">
+        <div class="card-body p-4">
+            <!-- Header & Filter Row -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                <h3 class="mb-0 text-white"><i class="bi bi-folder2-open me-2"></i>Patient Records</h3>
+
+                <form method="GET" action="{{ url_for('history') }}" class="d-flex gap-2 w-100 w-md-auto">
+                    <!-- Search Input -->
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-white-50"><i
+                                class="bi bi-search"></i></span>
+                        <input type="search" name="q" value="{{ q|default('') }}"
+                            class="form-control bg-dark border-secondary text-white" placeholder="Search ID or Name...">
+                    </div>
+
+                    <!-- Severity Filter -->
+                    <select name="severity" class="form-select bg-dark border-secondary text-white w-auto"
+                        onchange="this.form.submit()">
+                        <option value="All" {% if severity=='All' %}selected{% endif %}>All Severities</option>
+                        <option value="No DR" {% if severity=='No DR' %}selected{% endif %}>No DR</option>
+                        <option value="Mild" {% if severity=='Mild' %}selected{% endif %}>Mild NPDR</option>
+                        <option value="Moderate" {% if severity=='Moderate' %}selected{% endif %}>Moderate NPDR</option>
+                        <option value="Severe" {% if severity=='Severe' %}selected{% endif %}>Severe NPDR</option>
+                        <option value="Proliferative DR" {% if severity=='Proliferative DR' %}selected{% endif %}>
+                            Proliferative DR</option>
+                    </select>
+
+                    <a href="{{ url_for('history') }}" class="btn btn-outline-light" title="Clear Filters"><i
+                            class="bi bi-x-lg"></i></a>
+                </form>
+            </div>
+
+            <!-- Dark Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-dark table-borderless align-middle mb-0"
+                    style="background: transparent;">
+                    <thead class="border-bottom border-secondary text-white-50">
+                        <tr>
+                            <th class="py-3">ID</th>
+                            <th class="py-3">Date</th>
+                            <th class="py-3">Name</th>
+                            <th class="py-3">DR Stage</th>
+                            <th class="py-3">Suitability</th>
+                            <th class="py-3 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr class="border-bottom border-secondary" style="--bs-table-bg: transparent;">
+                            <td class="text-white">#{{ patient.id }}</td>
+                            <td class="text-white-50">{{ patient.date_posted.strftime('%Y-%m-%d') }}</td>
+                            <td class="fw-bold text-white">{{ patient.name }}</td>
+                            <td>
+                                <span
+                                    class="badge rounded-pill {% if patient.dr_stage == 'No DR' %}bg-success{% elif patient.dr_stage == 'Mild' %}bg-info text-dark{% elif patient.dr_stage == 'Moderate' %}bg-warning text-dark{% else %}bg-danger{% endif %} px-3 py-2">
+                                    {{ patient.dr_stage }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    {% if 'Not Suitable' in patient.operation_status %}
+                                    <i class="bi bi-x-circle-fill text-danger"></i> <span class="text-white-50">Not
+                                        Suitable</span>
+                                    {% else %}
+                                    <i class="bi bi-check-circle-fill text-success"></i> <span
+                                        class="text-white-50">Suitable</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('view_patient', patient_id=patient.id) }}"
+                                    class="btn btn-sm btn-primary-gradient px-3">View</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-white-50">
+                                <div class="mb-2" style="font-size: 2rem;">📂</div>
+                                No records found matching your criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4 mb-5">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-light px-4">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

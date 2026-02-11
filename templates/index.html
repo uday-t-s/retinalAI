@@ -1,0 +1,538 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        {% if not current_user.is_authenticated %}
+        <!-- ==================== LANDING PAGE ==================== -->
+
+        <!-- Badge -->
+        <div class="d-inline-block mb-4 user-badge border border-primary text-primary">
+            <span class="me-2">●</span> AI-Powered Medical Diagnosis
+        </div>
+
+        <!-- Title -->
+        <h1 class="hero-title">
+            Early Detection of<br>
+            <span class="gradient-text-purple">Diabetic Retinopathy</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-subtitle">
+            Advanced deep learning technology using <strong>EfficientNetB6</strong> architecture to
+            detect and classify diabetic retinopathy from retinal images with professional-grade accuracy.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="d-flex justify-content-center gap-3 mb-5">
+            <a href="{{ url_for('predict') }}" class="btn btn-primary-gradient shadow-lg">
+                Start Detection <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <!-- Stats Container -->
+        <div class="row justify-content-center mt-5 pt-4">
+            <div class="col-md-8">
+                <div class="card-custom">
+                    <div class="row text-center">
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="stat-number gradient-text-purple">89%</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">Accuracy</div>
+                        </div>
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="stat-number text-white">5</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">Severity Levels</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-number text-primary">B6</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">EfficientNet Model</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- ==================== DASHBOARD (LOGGED IN) ==================== -->
+
+        <div class="text-start mb-4 animate-fade-in">
+            <p class="text-white">Welcome back, {{ current_user.username }}</p>
+        </div>
+
+        <div class="text-center mb-5 animate-fade-in">
+            <!-- Badge -->
+            <div class="d-inline-block mb-4 user-badge border border-primary text-primary">
+                <span class="me-2">●</span> AI-Powered Medical Diagnosis
+            </div>
+
+            <!-- Title -->
+            <h1 class="hero-title">
+                Early Detection of<br>
+                <span class="gradient-text-purple">Diabetic Retinopathy</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="hero-subtitle">
+                Advanced deep learning technology using <strong>EfficientNetB6</strong> architecture to
+                detect and classify diabetic retinopathy from retinal images with professional-grade accuracy.
+            </p>
+
+            <!-- CTA Buttons (Restored to Hero) -->
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <a href="{{ url_for('predict') }}" class="btn btn-primary-gradient shadow-lg">
+                    Start Detection <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Model Stats (Requested "On Top") -->
+        <div class="row justify-content-center mb-5 animate-fade-in">
+            <div class="col-md-8">
+                <div class="card-custom">
+                    <div class="row text-center">
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="stat-number gradient-text-purple">89%</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">Accuracy</div>
+                        </div>
+                        <div class="col-md-4 border-end border-secondary">
+                            <div class="stat-number text-white">5</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">Severity Levels</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-number text-primary">B6</div>
+                            <div class="text-secondary small text-uppercase fw-bold mt-2">EfficientNet Model</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Top KPI Summary Row -->
+        <div class="mt-4 mb-5 animate-fade-in delay-100">
+            <div class="container kpi-row-container px-0">
+                <div class="row justify-content-center gx-3 gy-3">
+                    <!-- Year selector card -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div
+                            class="card-custom p-3 text-center d-flex flex-column justify-content-center align-items-center h-100 kpi-card">
+                            <div class="small text-white-50">Year</div>
+                            {% if years %}
+                            <form method="GET" action="{{ url_for('index') }}">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <select name="year"
+                                        class="form-select form-select-sm bg-dark text-white border-secondary">
+                                        {% for y in years %}
+                                        <option value="{{ y }}" {% if kpis and kpis.selected_year==y %}selected{% endif
+                                            %}>{{ y }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-primary">OK</button>
+                                </div>
+                            </form>
+                            {% else %}
+                            <div class="text-white-50">—</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div
+                            class="card-custom p-3 text-center d-flex flex-column justify-content-center align-items-center h-100 kpi-card">
+                            <div style="font-size:1.6rem">📊</div>
+                            <div class="small text-white-50">Total DR cases</div>
+                            <div class="h5 fw-bold mt-1 text-white">{{ kpis.total_dr_cases if kpis and
+                                kpis.total_dr_cases is not none else '—' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div
+                            class="card-custom p-3 text-center d-flex flex-column justify-content-center align-items-center h-100 kpi-card">
+                            <div style="font-size:1.6rem">📅</div>
+                            <div class="small text-white-50">Peak month</div>
+                            <div class="h5 fw-bold mt-1 text-white">{{ kpis.peak_month if kpis and kpis.peak_month else
+                                '—' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div
+                            class="card-custom p-3 text-center d-flex flex-column justify-content-center align-items-center h-100 kpi-card">
+                            <div style="font-size:1.6rem">🧮</div>
+                            <div class="small text-white-50">Avg monthly</div>
+                            <div class="h5 fw-bold mt-1 text-white">{{ kpis.avg_monthly if kpis and kpis.avg_monthly is
+                                not none else '—' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div
+                            class="card-custom p-3 text-center d-flex flex-column justify-content-center align-items-center h-100 kpi-card">
+                            <div style="font-size:1.6rem">🏥</div>
+                            <div class="small text-white-50">Total screened</div>
+                            <div class="h5 fw-bold mt-1 text-white">{{ kpis.total_screened if kpis and
+                                kpis.total_screened is not none else '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Clinical Analytics Section (Embedded) -->
+        <div class="row justify-content-center mt-4 animate-fade-in delay-200">
+            <div class="col-lg-10">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="text-white mb-0">Clinical Analytics</h4>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">{{
+                        kpis.selected_year }} Overview</span>
+                </div>
+
+                <!-- Top Stats Row -->
+                <div class="row g-3 mb-4">
+                    <!-- Total Scans -->
+                    <div class="col-md-4">
+                        <div class="stat-card p-3 h-100 d-flex flex-column justify-content-between"
+                            style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.05);">
+                            <div class="text-uppercase text-white xsmall fw-bold">Total Scans</div>
+                            <div class="d-flex align-items-end justify-content-between mt-2">
+                                <div class="h2 fw-bold text-white mb-0">{{ kpis.total_screened if kpis else 0 }}</div>
+                                <div class="icon-box text-primary opacity-25">
+                                    <i class="bi bi-layers-fill fs-3"></i>
+                                </div>
+                            </div>
+                            <div class="xsmall text-white mt-1">records processed</div>
+                        </div>
+                    </div>
+                    <!-- High Risk -->
+                    <div class="col-md-4">
+                        <div class="stat-card p-3 h-100 d-flex flex-column justify-content-between"
+                            style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(63, 24, 37, 0.4) 100%); border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <div class="text-uppercase text-danger xsmall fw-bold">High Risk</div>
+                            <div class="d-flex align-items-end justify-content-between mt-2">
+                                <div class="h2 fw-bold text-danger mb-0">{{ kpis.high_risk_cases if kpis else 0 }}</div>
+                                <div class="icon-box text-danger opacity-50">
+                                    <i class="bi bi-exclamation-circle-fill fs-3"></i>
+                                </div>
+                            </div>
+                            <div class="xsmall text-danger mt-1">critical cases</div>
+                        </div>
+                    </div>
+                    <!-- Healthy Eyes -->
+                    <div class="col-md-4">
+                        <div class="stat-card p-3 h-100 d-flex flex-column justify-content-between"
+                            style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 78, 59, 0.4) 100%); border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div class="text-uppercase text-success xsmall fw-bold">Healthy Eyes</div>
+                            <div class="d-flex align-items-end justify-content-between mt-2">
+                                <div class="h2 fw-bold text-success mb-0">{{ kpis.healthy_cases if kpis else 0 }}</div>
+                                <div class="icon-box text-success opacity-50">
+                                    <i class="bi bi-check-circle-fill fs-3"></i>
+                                </div>
+                            </div>
+                            <div class="xsmall text-success mt-1">clear screenings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="row g-4">
+                    <!-- Donut Chart -->
+                    <div class="col-lg-6">
+                        <div class="analytics-box p-4 h-100">
+                            <h6 class="text-white mb-4">Severity Distribution</h6>
+                            <div class="row align-items-center h-75">
+                                <div class="col-md-6">
+                                    <div style="position: relative; height: 180px; width: 100%;">
+                                        <canvas id="severityChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Custom Legend -->
+                                    <div class="d-flex flex-column gap-2 mt-3 mt-md-0">
+                                        <div class="d-flex align-items-center xsmall text-white"><span
+                                                class="badge-dot me-2" style="background:#10b981"></span> No DR
+                                        </div>
+                                        <div class="d-flex align-items-center xsmall text-white"><span
+                                                class="badge-dot me-2" style="background:#fbbf24"></span> Mild
+                                        </div>
+                                        <div class="d-flex align-items-center xsmall text-white"><span
+                                                class="badge-dot me-2" style="background:#f97316"></span>
+                                            Moderate</div>
+                                        <div class="d-flex align-items-center xsmall text-white"><span
+                                                class="badge-dot me-2" style="background:#ef4444"></span> Severe
+                                        </div>
+                                        <div class="d-flex align-items-center xsmall text-white"><span
+                                                class="badge-dot me-2" style="background:#d946ef"></span>
+                                            Proliferative
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Breakdown -->
+                    <div class="col-lg-6">
+                        <div class="analytics-box p-4 h-100">
+                            <h6 class="text-white mb-4">Detailed Breakdown</h6>
+                            <div class="d-flex flex-column gap-3">
+                                {% set stages = kpis.stage_counts if kpis else {'No DR':0, 'Mild':0,
+                                'Moderate':0,
+                                'Severe':0, 'Proliferative DR':0} %}
+                                <!-- No DR -->
+                                <div>
+                                    <div class="d-flex justify-content-between xsmall mb-1">
+                                        <span class="text-white">No DR</span>
+                                        <span class="text-white fw-bold">{{ stages['No DR'] }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: #334155;">
+                                        <div class="progress-bar"
+                                            style="width: {{ (stages['No DR'] / (kpis.total_screened if kpis and kpis.total_screened else 1)) * 100 }}%; background: #10b981;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Mild -->
+                                <div>
+                                    <div class="d-flex justify-content-between xsmall mb-1">
+                                        <span class="text-white">Mild NPDR</span>
+                                        <span class="text-white fw-bold">{{ stages['Mild'] }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: #334155;">
+                                        <div class="progress-bar"
+                                            style="width: {{ (stages['Mild'] / (kpis.total_screened if kpis and kpis.total_screened else 1)) * 100 }}%; background: #fbbf24;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Moderate -->
+                                <div>
+                                    <div class="d-flex justify-content-between xsmall mb-1">
+                                        <span class="text-white">Moderate NPDR</span>
+                                        <span class="text-white fw-bold">{{ stages['Moderate'] }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: #334155;">
+                                        <div class="progress-bar"
+                                            style="width: {{ (stages['Moderate'] / (kpis.total_screened if kpis and kpis.total_screened else 1)) * 100 }}%; background: #f97316;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Severe -->
+                                <div>
+                                    <div class="d-flex justify-content-between xsmall mb-1">
+                                        <span class="text-white">Severe NPDR</span>
+                                        <span class="text-white fw-bold">{{ stages['Severe'] }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: #334155;">
+                                        <div class="progress-bar"
+                                            style="width: {{ (stages['Severe'] / (kpis.total_screened if kpis and kpis.total_screened else 1)) * 100 }}%; background: #ef4444;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Proliferative -->
+                                <div>
+                                    <div class="d-flex justify-content-between xsmall mb-1">
+                                        <span class="text-white">Proliferative DR</span>
+                                        <span class="text-white fw-bold">{{ stages['Proliferative DR'] }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: #334155;">
+                                        <div class="progress-bar"
+                                            style="width: {{ (stages['Proliferative DR'] / (kpis.total_screened if kpis and kpis.total_screened else 1)) * 100 }}%; background: #d946ef;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Quick Actions Row -->
+<div class="row justify-content-center mt-4 mb-4 animate-fade-in delay-300">
+    <!-- Quick Actions -->
+    <div class="col-lg-9 mb-4">
+        <div class="card-custom h-100">
+            <div class="card-body p-4 text-center">
+                <div style="font-size:2rem;" class="mb-2">⚡</div>
+                <h5 class="mb-1 text-white">Quick Actions</h5>
+                <p class="text-white-50 mb-3">Manage data and tools.</p>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('upload_external') }}" class="btn btn-outline-primary btn-sm">Upload
+                        CSV</a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics') }}" class="btn btn-primary-gradient btn-sm">
+                        <i class="bi bi-graph-up me-1"></i>App Analytics
+                    </a>
+                    <a href="{{ url_for('external_analytics') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-table me-1"></i>External Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Patient History & Recent Activity Row (Downside) -->
+<div class="row justify-content-center mb-5 animate-fade-in delay-300">
+    <!-- Patient History & Recent Activity -->
+    <div class="col-lg-10 mb-4">
+        <div class="card-custom h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="mb-0 text-white">Recent Activity</h5>
+                    <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-light">View All</a>
+                </div>
+
+                {% if recent_patients %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0" style="background: transparent;">
+                        <thead>
+                            <tr>
+                                <th class="text-start text-white xsmall border-0 ps-3">ID</th>
+                                <th class="text-start text-white xsmall border-0">Name</th>
+                                <th class="text-center text-white xsmall border-0">Result</th>
+                                <th class="text-end text-white xsmall border-0 pe-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in recent_patients %}
+                            <tr>
+                                <td class="text-start border-secondary border-opacity-10 align-middle ps-3">
+                                    <div class="xsmall text-white">#{{ p.id }}</div>
+                                </td>
+                                <td class="text-start border-secondary border-opacity-10 align-middle">
+                                    <div class="fw-bold text-white small">{{ p.name }}</div>
+                                </td>
+                                <td class="text-center border-secondary border-opacity-10 align-middle">
+                                    {% if p.dr_stage == 'No DR' %}
+                                    <span
+                                        class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill"
+                                        style="font-size: 0.7rem; width: 80px;">Normal</span>
+                                    {% elif p.dr_stage == 'Mild' %}
+                                    <span
+                                        class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill"
+                                        style="font-size: 0.7rem; width: 80px;">Mild</span>
+                                    {% elif p.dr_stage == 'Moderate' %}
+                                    <span
+                                        class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill"
+                                        style="font-size: 0.7rem; width: 80px;">Moderate</span>
+                                    {% else %}
+                                    <span class="badge bg-danger text-white border border-danger rounded-pill"
+                                        style="font-size: 0.7rem; width: 80px;">Severe</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end border-secondary border-opacity-10 align-middle pe-3">
+                                    <div class="xsmall text-white">{{ p.date_posted.strftime('%d %b, %Y') if
+                                        p.date_posted else '-' }}</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="d-flex flex-column align-items-center justify-content-center h-75 text-center">
+                    <i class="bi bi-inbox text-white-50 fs-1 mb-2"></i>
+                    <p class="text-muted small">No recent records found.</p>
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary-gradient btn-sm mt-2">Start First
+                        Scan</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+</div>
+</div>
+
+<!-- Scripts for Dashboard Charts -->
+{% if current_user.is_authenticated %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .analytics-box {
+        background-color: #1e293b;
+        border-radius: 16px;
+        border: 1px solid #334155;
+    }
+
+    .xsmall {
+        font-size: 0.75rem;
+    }
+
+    .badge-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('severityChart');
+
+        if (ctx) {
+            try {
+                const stageData = {{ kpis.stage_counts | tojson if kpis and kpis.stage_counts else '{}'
+            }};
+
+        const dataCounts = [
+            stageData['No DR'] || 0,
+            stageData['Mild'] || 0,
+            stageData['Moderate'] || 0,
+            stageData['Severe'] || 0,
+            stageData['Proliferative DR'] || 0
+        ];
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative'],
+                datasets: [{
+                    data: dataCounts,
+                    backgroundColor: [
+                        '#10b981', // Green
+                        '#fbbf24', // Yellow
+                        '#f97316', // Orange
+                        '#ef4444', // Red
+                        '#d946ef'  // Purple/Pink
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Chart Error:", e);
+    }
+        }
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center animate-fade-in">
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="text-white mb-0">Activity Log: <span class="text-primary">{{ user.username }}</span></h2>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Users
+                </a>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-body p-0">
+                    {% if patients %}
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0 align-middle" style="background: transparent;">
+                            <thead class="bg-dark bg-opacity-50">
+                                <tr>
+                                    <th class="ps-4 py-3 text-white-50 small text-uppercase fw-bold border-0">Patient ID
+                                    </th>
+                                    <th class="py-3 text-white-50 small text-uppercase fw-bold border-0">Name</th>
+                                    <th class="py-3 text-white-50 small text-uppercase fw-bold border-0 text-center">DR
+                                        Stage</th>
+                                    <th class="py-3 text-white-50 small text-uppercase fw-bold border-0 text-end">Date
+                                    </th>
+                                    <th class="pe-4 py-3 text-white-50 small text-uppercase fw-bold border-0 text-end">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in patients %}
+                                <tr>
+                                    <td
+                                        class="ps-4 py-3 border-secondary border-opacity-10 text-white font-monospace small">
+                                        #{{ p.id }}</td>
+                                    <td class="py-3 border-secondary border-opacity-10 text-white fw-bold">{{ p.name }}
+                                    </td>
+                                    <td class="py-3 border-secondary border-opacity-10 text-center">
+                                        {% if p.dr_stage == 'No DR' %}
+                                        <span
+                                            class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">No
+                                            DR</span>
+                                        {% elif p.dr_stage == 'Mild' %}
+                                        <span
+                                            class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2">Mild</span>
+                                        {% elif p.dr_stage == 'Moderate' %}
+                                        <span
+                                            class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">Moderate</span>
+                                        {% elif p.dr_stage == 'Severe' %}
+                                        <span
+                                            class="badge bg-danger text-white border border-danger rounded-pill px-3 py-2">Severe</span>
+                                        {% elif p.dr_stage == 'Proliferative DR' %}
+                                        <span
+                                            class="badge bg-purple text-white border border-purple rounded-pill px-3 py-2">Proliferative</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary text-white">{{ p.dr_stage }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 border-secondary border-opacity-10 text-end text-white-50 small">
+                                        {{ p.date_posted.strftime('%Y-%m-%d %H:%M') }}
+                                    </td>
+                                    <td class="pe-4 py-3 border-secondary border-opacity-10 text-end">
+                                        <a href="{{ url_for('view_patient', patient_id=p.id) }}"
+                                            class="btn btn-sm btn-outline-primary" title="View Full Analysis">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div style="font-size: 3rem;" class="mb-3">📂</div>
+                        <h5 class="text-white">No Activity Found</h5>
+                        <p class="text-white-50">This user has not performed any predictions yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-dark bg-opacity-50 border-top border-secondary border-opacity-10 p-3">
+                    <div class="text-white-50 xsmall">
+                        Total Predictions: <span class="text-white fw-bold">{{ patients|length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
