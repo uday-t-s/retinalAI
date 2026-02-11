@@ -29,7 +29,7 @@ with app.app_context():
     # Create Admin User if not exists
     if not User.query.filter_by(username='sowkya').first():
         hashed_password = generate_password_hash('1234')
-        admin = User(username='sowkya', password=hashed_password, role='admin')
+        admin = User(username='sowkya', email='sowkya@example.com', password=hashed_password, role='admin')
         db.session.add(admin)
         db.session.commit()
 
@@ -816,5 +816,8 @@ def admin_user_activity(user_id):
     
     return render_template('admin_user_details.html', user=user, patients=patients, title=f"Activity Log - {user.username}")
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
