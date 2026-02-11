@@ -8,3 +8,8 @@ tensorflow
 
 matplotlib
 Flask-Mail
+Flask
+gunicorn
+tensorflow
+pandas
+numpy
